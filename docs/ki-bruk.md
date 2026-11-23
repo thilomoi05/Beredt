@@ -37,3 +37,11 @@ Vi har fulgt reglene i `AGENT.md` for alt arbeid med KI:
 * **Aldri selv-merge:** Ingen godkjenner eller merger sin egen PR – en annen på gruppa må sjekke og godkjenne.
 * **Commit-merking:** Commits som er laget med KI er merket i loggen med:
   `Co-Authored-By: Claude`
+
+## 5. Felles kontekst med Obsidian-vault
+
+Underveis i prosjektet ble én lang chat med Claude for stor og uoversiktlig. Vi flyttet derfor prosjektdokumentasjonen over i et Obsidian-vault, en mappe med Markdown-notater som fungerte som en felles «second brain» for KI-en. Vaultet inneholder blant annet prosjektoversikt, krav fra casen, beslutninger vi har tatt (for eksempel at tofaktorautentisering ikke er et krav), notater om hver funksjon, tidligere rapporter og tilbakemeldingene vi har fått.
+
+I stedet for å forklare prosjektet på nytt i hver samtale, leste KI-en de relevante notatene først. Det ga kortere samtaler og mindre forbruk av tokens, og KI-en gjentok sjeldnere feil vi allerede hadde fått tilbakemelding på. I rapportfasen delte vi vaultet med hele gruppa, slik at alle sine KI-assistenter jobbet ut fra den samme informasjonen.
+
+Selve vaultet ligger ikke i repoet, fordi det inneholder interne notater og tilbakemeldinger fra emnene.
