@@ -1,21 +1,99 @@
-# Beredt
+<div align="center">
 
-En nettportal for krisesituasjoner der **offentlige aktører** (Heimevernet, kommuner) melder inn behov, og **private aktører** (bedrifter, entreprenører, privatpersoner) tilbyr ressurser som aggregater, drivstoff og transport. Behov og ressurser vises på et kart, slik at det blir lett å se hvor hjelpen trengs og hva som finnes i nærheten.
+<img src="docs/bilder/banner.jpg" alt="Beredt – kriseportal som kobler behov og ressurser når strømmen går" width="100%">
 
-Prosjektet er laget som gruppeoppgave i IS-200 (Oppgave 1 og Oppgave 2) og er en **ASP.NET Core MVC-applikasjon som kjøres sammen med en MariaDB-database i Docker**.
+<br>
 
-## Gruppemedlemmer
+![.NET 10](https://img.shields.io/badge/.NET-10-512BD4?logo=dotnet&logoColor=white)
+![ASP.NET Core MVC](https://img.shields.io/badge/ASP.NET_Core-MVC-512BD4)
+![MariaDB 11.4](https://img.shields.io/badge/MariaDB-11.4-003545?logo=mariadb&logoColor=white)
+![Docker Compose](https://img.shields.io/badge/Docker-Compose-2496ED?logo=docker&logoColor=white)
+![Leaflet](https://img.shields.io/badge/Kart-Leaflet_%2B_Kartverket-199900?logo=leaflet&logoColor=white)
+![Tester](https://img.shields.io/badge/tester-162_best%C3%A5tt-2ea44f)
 
-- Thilo Moi
-- Tobias K. Lindkvist
-- Christian Urdal Hansen
-- Ludvig Jensen
-- Pelle Kvandal
-- Emil Lund Storebaug
+**Beredt kobler behov fra offentlige aktører med ressurser fra bedrifter og privatpersoner under en krise, og viser alt på ett kart.**
+
+[Se demo](#se-beredt-i-bruk) · [Kom i gang](#kom-i-gang) · [Arkitektur](#arkitektur) · [Dokumentasjon](#dokumentasjon)
+
+</div>
 
 ---
 
-## Hurtigstart
+## Se Beredt i bruk
+
+<table>
+  <tr>
+    <td width="50%" align="center">
+      <a href="https://youtu.be/oDRM7-IV-T8"><img src="docs/bilder/thumbnail-demo.jpg" alt="Se demoen av Beredt på YouTube"></a>
+      <br><b>Demo</b> – kort presentasjon av portalen
+    </td>
+    <td width="50%" align="center">
+      <a href="https://youtu.be/SQKd4gYPiag"><img src="docs/bilder/thumbnail-gjennomgang.jpg" alt="Se gjennomgangen av Beredt på YouTube"></a>
+      <br><b>Gjennomgang</b> – alle rollene, steg for steg
+    </td>
+  </tr>
+</table>
+
+## Hva er Beredt?
+
+Et cyberangrep slår ut strømnettet i Kristiansand. Kommunen, sykehuset og Heimevernet trenger raskt aggregater, drivstoff og transport, men mye av det finnes hos bedrifter og privatpersoner. Hvem har hva, og hvor?
+
+I Beredt melder **offentlige aktører** inn behov, og **private aktører** tilbyr ressurser. En **administrator** godkjenner og tildeler ressursene, med forslag sortert på type og avstand. Alt vises på et kart med data fra Kartverket.
+
+Portalen er laget av Gruppe 19 ved Universitetet i Agder, med en case fra Kartverket og Heimevernet.
+
+## Slik fungerer det
+
+| Offentlig aktør | Privat aktør | Administrator |
+|---|---|---|
+| Melder behov med type, prioritet og plassering | Tilbyr ressurser i tre steg, med bilder og kartpunkt | Godkjenner nye ressurser og offentlige aktører |
+| Ser behov og godkjente ressurser på kart og i lister | Følger status på egne ressurser | Tildeler ressurser til behov, med forslag etter type og avstand |
+| Finner og ber om en ressurs til eget behov | Ser hva som trengs, uten å se hvem som meldte det | Behandler forespørsler og følger alt i adminloggen |
+
+## Skjermbilder
+
+<p align="center">
+  <img src="docs/bilder/kart.jpg" alt="Kartet med behov og ressurser" width="100%">
+  <br><sub>Kartet: behov farget etter prioritet, ressurser som firkanter, og detaljer i boblen.</sub>
+</p>
+
+<table>
+  <tr>
+    <td width="50%"><img src="docs/bilder/tilby-ressurs.png" alt="Skjema for å tilby en ressurs"><br><sub>Tilby ressurs: plassering med adressesøk eller klikk i kartet.</sub></td>
+    <td width="50%"><img src="docs/bilder/admin.png" alt="Adminsiden med godkjenningskøer"><br><sub>Adminsiden: køer for forespørsler, ressurser og behov.</sub></td>
+  </tr>
+</table>
+
+## Funksjoner
+
+- **Kart** med Leaflet og kartfliser fra Kartverket, egne ikoner per type og farge per prioritet
+- **Tildeling med forslag:** ledige ressurser av passende type, sortert etter avstand
+- **Forespørsler:** offentlige aktører kan be om en bestemt ressurs, og admin godkjenner
+- **Historikk og adminlogg:** alt som skjer med et behov eller en ressurs blir lagret, med hvem og når
+- **Søk og filter** i alle lister
+- **Personvern:** adresse, tilgangsbeskrivelse og bilder vises bare for godkjente offentlige aktører
+- **Tilpasset mobil** og laptop
+
+## Teknologi
+
+| Område | Teknologi |
+|---|---|
+| Rammeverk | ASP.NET Core MVC, .NET 10 |
+| Innlogging | ASP.NET Core Identity (passord-hash med PBKDF2, roller, utestenging) |
+| Database | MariaDB 11.4 med Entity Framework Core og migrations |
+| Kart | [Leaflet](https://leafletjs.com/) med kartfliser og adressesøk fra Kartverket |
+| Testing | xUnit og NSubstitute |
+| Drift | Docker Compose (to containere: `web` og `db`) |
+
+## Arkitektur
+
+<p align="center"><img src="docs/bilder/arkitektur.png" alt="Arkitekturdiagram for Beredt" width="100%"></p>
+
+Controllerne kjenner bare repository-grensesnittene. Da databasen ble byttet fra minnet til MariaDB, var `Program.cs` den eneste filen som måtte endres. Reglene for godkjenning, tildeling og historikk ligger samlet i `TildelingTjeneste`, så de er like uansett hvilken side de brukes fra.
+
+Full beskrivelse: **[docs/arkitektur.md](docs/arkitektur.md)**
+
+## Kom i gang
 
 **Krever:** [Docker Desktop](https://www.docker.com/products/docker-desktop/)
 
@@ -26,431 +104,45 @@ cp .env.example .env      # Windows (PowerShell): copy .env.example .env
 docker compose up --build
 ```
 
-`.env.example` fungerer som den er: den har passord til databasen og `TESTBRUKER_PASSORD=Beredt2026`, så testbrukerne under lages første gang appen starter. Bytt gjerne passordene i `.env` til egne.
-
-Er port 3306 opptatt (feilmelding om `3306` ved oppstart), sett `DB_PORT=3307` i `.env`. Mer om `.env` og feilsøking: [docs/drift.md](docs/drift.md).
-
 Åpne **http://localhost:8080** og logg inn med en av testbrukerne:
 
-| Brukernavn | Passord | Rolle | Hva du ser |
-|---|---|---|---|
-| `test` | `Beredt2026` | Offentlig aktør (f.eks. Heimevernet) | Oversikt, kart, behov, ressurser og hva som trengs |
-| `privat` | `Beredt2026` | Privat aktør (bedrift eller privatperson) | Egne ressurser, tilby ressurs og hva som trengs |
-| `admin` | `Beredt2026` | Administrator (har også rollen offentlig aktør) | Alt en offentlig aktør ser, pluss adminsiden for godkjenning og tildeling |
-
-Passordet kommer fra `TESTBRUKER_PASSORD` i `.env`, og testbrukerne lages første gang appen starter. Se [Testbrukere i docs/drift.md](docs/drift.md#testbrukere).
-
-Mer om kjøring, begrensninger og feilsøking: **[docs/drift.md](docs/drift.md)**
-
----
-
-## Funksjoner
-
-Tre roller, med tilgang sjekket på serveren (`[Authorize(Roles = ...)]`):
-
-| Rolle | Kan |
-|---|---|
-| **Offentlig aktør** (kommune, sykehus, Heimevernet) | Melde behov med type, prioritet og plassering · se alle behov med filter · se alle godkjente ressurser i en liste med filter · se kart med behov og ressurser · finne og forespørre ressurser til egne behov · **endre** og trekke tilbake egne behov |
-| **Privat aktør** (bedrift, privatperson) | Tilby ressurser med bilder · se egne ressurser i en liste («Mine ressurser») · se status på egne ressurser (venter, godkjent, avvist, tildelt) · **endre** og trekke tilbake egne ressurser · se «Hva trengs» uten å se hvem som har meldt |
-| **Admin** | Godkjenne eller avvise ressurser og offentlige aktører · tildele ressurser til behov med forslag sortert på avstand · godkjenne eller avslå forespørsler · fjerne tildelinger · endre alle behov og ressurser |
-
-I tillegg:
-
-- **Registrering og innlogging** med ASP.NET Core Identity. Offentlige aktører må godkjennes av admin før de kan logge inn.
-- **Min side:** alle kan endre navn, e-post og passord. Ny e-post og nytt passord krever det nåværende passordet.
-- **Kart** (Leaflet + Kartverket) med egne ikoner per type og farge per prioritet. Skjemaene har en posisjonsvelger: klikk i kartet eller søk opp en adresse.
-- **Oversikt** over ressurser og behov: dashbord, liste med filter under kartet, detaljsider og oversikt over tildelinger.
-- **Historikk:** alt som skjer med et behov eller en ressurs (sendt inn, godkjent, endret, tildelt, trukket tilbake) lagres og vises på detaljsiden.
-- **Mobiltilpasset:** responsivt design med Bootstrap og egne `@media`-regler.
-
-## Teknologi
-
-| Område | Teknologi |
-|---|---|
-| Rammeverk | ASP.NET Core MVC, .NET 10 |
-| Innlogging | ASP.NET Core Identity (passord-hash med PBKDF2 og salt, roller, utestenging) |
-| Datalagring | MariaDB 11.4 med Entity Framework Core 10 (Microting.EntityFrameworkCore.MySql) og migrations |
-| Kart | [Leaflet](https://leafletjs.com/) med kartfliser fra Kartverket |
-| Adressesøk | Geonorge sitt adresse-API (`ws.geonorge.no/adresser/v1`) |
-| Testing | xUnit og NSubstitute |
-| Drift | Docker Compose (to containere: `web` og `db`) |
-
----
-
-## Arkitektur
-
-Applikasjonen følger **MVC-mønsteret** (Model–View–Controller), med et eget **repository-lag** for datalagring. Controllerne kjenner bare repository-grensesnittene, derfor ble MariaDB lagt til uten å endre dem. 
-
-```mermaid
-flowchart LR
-    B[Nettleser] -->|GET / POST| C[Controller]
-    C -->|leser/skriver| R[Repository]
-    R -->|EF Core| D[(MariaDB i Docker)]
-    C -->|Identity| D
-    C -->|ViewModel| V[View .cshtml]
-    V -->|HTML| B
-    K[kart.js] -->|GET JSON| C
-```
-
-Full beskrivelse av lagene, innlogging, kartet og alle endepunkter: **[docs/arkitektur.md](docs/arkitektur.md)**
-
-### Prosjektstruktur
-
-```
-├── Controllers/        Home, Konto, Oversikt, Behov, Ressurs, Kart, HvaTrengs, Tildeling, Foresporsel, Admin
-├── Data/               BeredskapsDbContext, oppstart av database og testbrukere
-├── Migrations/         Tabellene i MariaDB, laget med EF Core migrations
-├── Models/             Behov, Ressurs, Bruker, Tildeling, Foresporsel, Hendelse, Roller, Enums
-│   └── ViewModeller/   Skjemamodeller med validering
-├── Services/           Repository-grensesnitt, EF- og minnebaserte repositories, TildelingTjeneste
-├── Sikkerhet/          Sikkerhetsheadere og norske feilmeldinger fra Identity
-├── Views/              Én mappe per controller + Shared/_Layout
-├── wwwroot/            CSS og JavaScript (kart, posisjonsvelger, skjemaer, filter)
-├── Beredskapsportal.Tests/   Automatiske tester (xUnit)
-├── docs/               drift.md, arkitektur.md, ki-bruk.md
-├── docker-compose.yml  App og database
-├── Dockerfile
-└── Program.cs          Oppstart, DI, Identity, sikkerhet og ruting
-```
-
-### Sider og endepunkter
-
-| Metode | Adresse | Beskrivelse | Tilgang |
-|---|---|---|---|
-| GET | `/` | Forside | Alle |
-| GET / POST | `/Konto/Registrer` | Registrere bruker (offentlig eller privat aktør) | Alle |
-| GET / POST | `/Konto/LoggInn` | Logge inn | Alle |
-| POST | `/Konto/LoggUt` | Logge ut | Innlogget |
-| GET | `/Konto/Profil` | Min side | Innlogget |
-| GET / POST | `/Konto/EndreProfil` | Endre navn og e-post (e-post krever nåværende passord) | Innlogget |
-| GET / POST | `/Konto/EndrePassord` | Endre passord | Innlogget |
-| GET | `/Oversikt` | Dashbord | Innlogget |
-| GET | `/HvaTrengs` | Hva som trengs, uten hvem som har meldt | Innlogget |
-| GET | `/Behov` | Alle behov med filter | Offentlig aktør |
-| GET / POST | `/Behov/Registrer` | Melde behov | Offentlig aktør |
-| GET | `/Behov/Detaljer/{id}` | Detaljside med historikk | Offentlig aktør |
-| GET / POST | `/Behov/Rediger/{id}` | Endre behov | Den som meldte det, og admin |
-| GET / POST | `/Behov/TrekkTilbake/{id}` | Trekke tilbake eget behov | Den som meldte det, og admin |
-| GET | `/Ressurs` | Liste over ressurser med filter på type og status, sortert med tilgjengelige øverst og avviste nederst. Private aktører («Mine ressurser») ser bare type, adresse og status, og en knapp for å endre | Innlogget. Offentlige ser godkjente og egne, private bare egne, admin alle |
-| GET / POST | `/Ressurs/Registrer` | Tilby ressurs med bilder | Innlogget |
-| GET | `/Ressurs/Detaljer/{id}` | Detaljside med bilder, kart og historikk | Eier, admin, eller offentlig aktør når godkjent |
-| GET / POST | `/Ressurs/Rediger/{id}` | Endre ressurs | Eier og admin |
-| GET / POST | `/Ressurs/TrekkTilbake/{id}` | Trekke tilbake (slette) ressurs | Eier og admin |
-| GET | `/Ressurs/Bilde/{id}` | Bilde av ressurs | Samme som detaljsiden |
-| GET | `/Kart` | Kart med liste og filter | Offentlig aktør |
-| GET | `/Kart/Behov`, `/Kart/Ressurser` | Punkter som JSON til kartet | Offentlig aktør |
-| GET | `/Foresporsel/FinnRessurs/{id}` | Forslag til ressurser for eget behov | Offentlig aktør |
-| POST | `/Foresporsel/Foresporr` | Forespørre en ressurs | Offentlig aktør |
-| GET | `/Tildeling` | Alle tildelinger med filter | Offentlig aktør |
-| GET | `/Admin` | Godkjenning av ressurser, brukere og forespørsler | Admin |
-| GET / POST | `/Admin/Tildel/{id}` | Tildele ressurser til et behov | Admin |
-| POST | `/Admin/GodkjennRessurs`, `AvvisRessurs`, `GodkjennBruker`, `AvvisBruker`, `GodkjennForesporsel`, `AvslaForesporsel`, `FjernTildeling` | Handlinger på adminsiden | Admin |
-
-**Flyt i et skjema (eksempel):** `GET /Behov/Registrer` viser skjemaet → brukeren sender det inn med `POST` → controlleren validerer og lagrer i MariaDB via repository → brukeren sendes videre til `/Behov`, der det nye behovet vises.
-
----
-
-## Krav i Oppgave 1
-
-| # | Krav | Hvor | Status |
-|---|---|---|---|
-| – | Kjøres i Docker | `Dockerfile`, [docs/drift.md](docs/drift.md) | Ferdig |
-| 1 | Controller, view-modell og view | `Controllers/`, `Models/ViewModeller/`, `Views/` | Ferdig |
-| 2 | Responsive sider med dynamisk innhold fra webserver | Razor-views, `site.css`, kartdata som JSON | Ferdig |
-| 3 | Håndterer GET og POST | Se tabellen over endepunkter | Ferdig |
-| 4 | Skjema, og data vises på en annen side | Behov: `/Behov/Registrer` → `/Behov` og `/Oversikt` | Ferdig |
-| 5 | Kart, og data fra kartet vises på en annen side | Posisjonsvelger i skjemaene → punkter på `/Kart` | Ferdig |
-| 6 | Dokumentasjon om drift, arkitektur og testing | [docs/drift.md](docs/drift.md), arkitektur og [testing](#testing) i denne README | Ferdig |
-| 7 | Dokumentasjon i koden | Norske kommentarer og XML-summaries i koden | Ferdig |
-| 8 | Bruk av KI | Se under | Ferdig |
-
-## Krav i Oppgave 2
-
-| # | Krav | Hvor i koden / dokumentasjonen | Status |
-|---|---|---|---|
-| 1 | Kobling mot MariaDB, app og database i Docker | `docker-compose.yml`, `Data/BeredskapsDbContext.cs`, `Migrations/`, `Services/Ef*Repository.cs`, [docs/drift.md](docs/drift.md) | Ferdig |
-| 2 | Registrering av ny bruker, lagret i databasen | `Controllers/KontoController.cs` (`Registrer`, og `EndreProfil`/`EndrePassord` på Min side), `Models/Bruker.cs` (tabellen `AspNetUsers`) | Ferdig |
-| 3 | Autentisering, autorisering, og legge til, endre og slette ressurs | `KontoController`, `[Authorize(Roles)]` på controllerne, `RessursController` (`Registrer`, `Rediger`, `TrekkTilbake`) | Ferdig |
-| 4 | Funksjoner som beskrevet av oppdragsgiveren | [Funksjoner](#funksjoner), `Services/TildelingTjeneste.cs`, [docs/arkitektur.md](docs/arkitektur.md) avsnitt 1 og 5b | Ferdig |
-| 5 | Kartet i skjemaet setter et punkt | `wwwroot/js/posisjonsvelger.js`, `Views/Behov/Registrer.cshtml`, `Views/Ressurs/Registrer.cshtml` | Ferdig |
-| 6 | Mobiltilpasset frontend | `wwwroot/css/site.css` (`@media`), `_Layout.cshtml`, [mobiltest](#mobiltest) | Ferdig |
-| 7 | Enkel oversikt over ressurser | `/Oversikt`, `/Ressurs` (liste med filter), lista under kartet, `/Ressurs/Detaljer`, `/Tildeling` | Ferdig |
-| 8 | Sikkerhetstiltak | `Program.cs`, `Sikkerhet/SikkerhetsheadereMiddleware.cs`, [docs/arkitektur.md](docs/arkitektur.md) avsnitt 6 | Ferdig |
-| 9 | Testing (enhet, system, sikkerhet, brukervennlighet) | `Beredskapsportal.Tests/` (162 tester), [Testing](#testing) | Enhet, system, sikkerhet og mobil ferdig. Brukervennlighetstest delvis (privat aktør testet 12.11.2026) |
-| 10 | Dokumentasjon om drift, arkitektur og testing | [docs/drift.md](docs/drift.md), [docs/arkitektur.md](docs/arkitektur.md), [Testing](#testing) | Ferdig |
-| 11 | Dokumentasjon i koden | `/// <summary>` på alle klasser, norske kommentarer i C#, Razor (`@* *@`) og JavaScript | Ferdig |
-| 12 | Bruk av KI | [Bruk av KI](#bruk-av-ki), [docs/ki-bruk.md](docs/ki-bruk.md) | Ferdig |
-
-### Endret etter tilbakemelding på innlevering 1
-
-| Tilbakemelding | Hva vi har gjort |
-|---|---|
-| Legg inn konkrete prompter i KI-delen | Lagt til flere prompter vi faktisk har brukt, se [Bruk av KI](#bruk-av-ki) og [docs/ki-bruk.md](docs/ki-bruk.md) |
-| Mangler automatiske tester for POST-håndtering av behov og ressurser | Nye tester i `BehovControllerTester.cs` og `RessursControllerTester.cs`: gyldig skjema lagres, ugyldig skjema lagres ikke, manglende plassering, for mange og for store bilder |
-| Mangler tester for validering av skjemaer | Ny `ValideringTester.cs` med de ekte valideringsreglene for behov, ressurs, innlogging og registrering (påkrevde felt, telefon, e-post, maks lengde) |
-| Mangler tester for `/Kart/Behov` og `/Kart/Ressurser` | Ny `KartControllerTester.cs`: riktige felt i JSON-svaret, bare godkjente ressurser, tildelte ressurser merket, bare GET og bare offentlige aktører |
-| Rate limiting, f.eks. ved innlogging | Maks 10 forsøk per minutt per IP på innlogging og registrering (`Sikkerhet/Fartsgrenser.cs`), i tillegg til utestenging etter 5 feil passord |
-| SQL-injeksjon | All databasetilgang går gjennom EF Core med parametere, ingen egen SQL. Testet manuelt, se [sikkerhetstesten](#sikkerhetstest) |
-| Beskyttelse mot XSS | Razor-encoding, ingen `@Html.Raw`, `trygg()` i JavaScript og Content-Security-Policy uten `unsafe-inline`. Testet manuelt, se [sikkerhetstesten](#sikkerhetstest) |
-| Kontroll av opplastede filer | Innholdet i filen sjekkes nå, ikke bare endelsen (`Sikkerhet/Bildesjekk.cs`), og hele skjemaet har en grense på 26 MB. Tester i `SikkerhetTester.cs` |
-
-I tillegg fant vi at tekstfeltene i skjemaene ikke hadde maks lengde, mens kolonnene i databasen har det. For lang tekst ga en feil fra databasen. Nå har feltene `[StringLength]` med samme lengde, og brukeren får en melding.
-
----
-
-## Testing
-
-Vi har fire typer tester. Enhetstestene kjører automatisk. System-, sikkerhets- og mobiltesten er kjørt manuelt i nettleseren mot appen i Docker, med MariaDB og ekte data. Brukervennlighetstesten gjøres med personer utenfor gruppa (se [status](#brukervennlighetstest)).
-
-| Type | Hva | Hvor |
+| Brukernavn | Passord | Rolle |
 |---|---|---|
-| Enhetstesting | Automatiske xUnit-tester av controllere, tjenester, repositoryer, modeller, validering og sikkerhet | [Automatiske tester](#automatiske-tester-xunit) |
-| Systemtesting | Hovedflytene fra start til slutt, med alle tre rollene | [Systemtest](#systemtest) |
-| Sikkerhetstesting | Forsøk på å bryte tilgangskontroll, CSRF, XSS, SQL-injeksjon, filopplasting og innlogging | [Sikkerhetstest](#sikkerhetstest) |
-| Brukervennlighetstesting | Personer utenfor gruppa løser oppgaver i appen | [Brukervennlighetstest](#brukervennlighetstest) |
+| `test` | `Beredt2026` | Offentlig aktør |
+| `privat` | `Beredt2026` | Privat aktør |
+| `admin` | `Beredt2026` | Administrator |
 
-✅ bestått · ⚠️ bestått med merknad · ❌ feilet
+Testbrukerne er bare for lokal kjøring. Mer om oppsett, porter og feilsøking: **[docs/drift.md](docs/drift.md)**
 
-### Automatiske tester (xUnit)
+## Testing og kvalitet
 
-Testene kjører uten Docker og uten database. De bruker de minnebaserte repositoriene (`InMemory*Repository`), og Identity erstattes med NSubstitute.
+- **162 automatiske tester** (xUnit og NSubstitute) som kjøres uten database: `dotnet test Beredskapsportal.Tests`
+- **Sikkerhetstest** mot vanlige angrep (OWASP): tilgangskontroll, CSRF, XSS, SQL-injeksjon, falske bilder, rate limiting
+- **System-, mobil- og brukertester**, med resultater og funn
+- **Alle endringer via pull request** med kodegjennomgang
 
-```bash
-dotnet test Beredskapsportal.Tests
-```
+Detaljerte testresultater: **[docs/testing.md](docs/testing.md)**
 
-**Resultat (05.11.2026):** 162 av 162 tester bestått ✅ (77 fra Oppgave 1 og 85 nye i Oppgave 2)
+## KI i utviklingen
 
-| Testfil | Hva den sjekker |
+Vi brukte Claude Code som kodeassistent, med egne regler for agenten i [AGENT.md](AGENT.md). Agenten committer aldri rett til main, og alle endringer går gjennom pull request og kodegjennomgang. Hvordan vi brukte KI, med eksempler på prompter: **[docs/ki-bruk.md](docs/ki-bruk.md)**
+
+## Dokumentasjon
+
+| Dokument | Innhold |
 |---|---|
-| `BehovControllerTester.cs` | POST av behov: gyldig skjema lagres, tomt skjema og manglende plassering avvises, tekst lagres uendret |
-| `RessursControllerTester.cs` | POST av ressurs: lagres som «venter», ugyldig skjema lagres ikke, bilderegler (antall, størrelse, type, innhold), `/Ressurs/Bilde` kan ikke hente andre filer |
-| `RessursListeTester.cs` | `/Ressurs`: private ser bare egne ressurser, offentlige godkjente og sine egne (også de som venter), admin alle, tildelte ressurser merkes, og lista sorteres med tilgjengelige først og avviste sist |
-| `RedigerBehovTester.cs` | Endre behov: bare den som meldte det og admin, endringer lagres, status, dato og eier endres ikke, endret prioritet i historikken |
-| `RedigerRessursTester.cs` | Endre ressurs: bare eier og admin, endringer lagres, ny godkjenning etter endring, nye bilder erstatter gamle, historikk |
-| `ValideringTester.cs` | Valideringsreglene i skjemaene for behov, ressurs, innlogging og registrering (påkrevde felt, telefon, e-post, maks lengde) |
-| `KartControllerTester.cs` | `/Kart/Behov` og `/Kart/Ressurser`: feltene kart.js bruker, bare godkjente ressurser, tildelte merket, bare GET og bare offentlige aktører |
-| `KontoControllerTester.cs` | Innlogging (riktig og feil passord, ukjent bruker, låst konto, ikke godkjent), registrering, og endring av navn, e-post og passord på Min side |
-| `OversiktControllerTester.cs` | «Mine meldte behov» på Oversikt |
-| `SikkerhetTester.cs` | Sikkerhetsheadere og CSP, roller, norske feilmeldinger, rate limiting (også på Min side), grense på opplasting, sjekk av bildeinnhold |
-| `TilgangTester.cs` | Hvilke roller controllerne krever |
-| `DetaljerTester.cs` | Detaljsidene, og at private aktører bare ser sine egne ressurser |
-| `TildelingTjenesteTester.cs`, `TildelingsforslagTester.cs` | Godkjenning, tildeling, forespørsler, tilbaketrekking og avstand |
-| `ForesporselControllerTester.cs`, `TildelingControllerTester.cs`, `HvaTrengsControllerTester.cs` | Forespørsler, tildelingslista og «Hva trengs» |
-| `BehovRepositoryTester.cs`, `TildelingRepositoryTester.cs`, `ModellTester.cs`, `ControllerTester.cs`, `IdentitetOppsettTester.cs` | Tellinger, eksempeldata, passordregler, forsiden og oppsett av roller og testbrukere |
+| [docs/arkitektur.md](docs/arkitektur.md) | Lagene, innlogging, kartet og alle endepunkter |
+| [docs/drift.md](docs/drift.md) | Oppsett, `.env`, testbrukere og feilsøking |
+| [docs/testing.md](docs/testing.md) | Automatiske tester, system-, sikkerhets-, mobil- og brukertester |
+| [docs/oppgavekrav.md](docs/oppgavekrav.md) | Kravene i Oppgave 1 og 2, endringer etter tilbakemelding, alle endepunkter og kjente begrensninger |
+| [docs/ki-bruk.md](docs/ki-bruk.md) | Bruk av KI i prosjektet |
 
-`TestHjelpere.cs` og `IdentitetHjelpere.cs` inneholder erstatninger for innlogging, filsystem og Identity, så controllerne kan testes uten at appen kjører.
+## Teamet
 
-### Systemtest
+Gruppe 19: **Thilo Moi** · **Tobias K. Lindkvist** · **Christian Urdal Hansen** · **Ludvig Jensen** · **Pelle Kvandal** · **Emil Lund Storebaug**
 
-**Dato:** 03.11.2026 · **Miljø:** Windows, Docker Desktop (app og MariaDB i Docker), Chrome · **Kode:** branchen `feature/oppgave2-endre-ressurs-og-testing` · **Testbrukere:** `test`, `privat` og `admin` (se [docs/drift.md](docs/drift.md#testbrukere))
+## Om prosjektet
 
-#### Registrering og innlogging
+Laget høsten 2026 i emnene IS-200, IS-201 og IS-202 ved Universitetet i Agder, og vist fram på emnenes EXPO. Casen *Kriseberedskap: ressurs- og behovsportal for Totalforsvaret* er gitt av Kartverket og Heimevernet.
 
-| Scenario | Steg | Forventet | Faktisk |
-|---|---|---|---|
-| Registrere privat aktør | `/Konto/Registrer`, rolle privat aktør | Logges inn og sendes til Oversikt | ✅ Logget inn, navnet vises i menyen |
-| Registrere offentlig aktør | `/Konto/Registrer`, rolle offentlig aktør | Kontoen lages, men må godkjennes | ✅ «Takk! Kontoen er opprettet, men må godkjennes av en administrator før du kan logge inn.» |
-| Logge inn før godkjenning | Logg inn med den nye offentlige aktøren | Nektes | ✅ «Kontoen din venter på godkjenning fra en administrator.» |
-| Admin godkjenner bruker | `/Admin` → «Godkjenn» | Brukeren kan logge inn og ser kartet | ✅ Logget inn, `/Kart` åpnes |
-| Brukernavn opptatt | Registrer `test` | Feilmelding | ✅ «Brukernavnet «test» er allerede i bruk.» |
-| Svakt passord | Passord uten tall og stor bokstav | Feilmelding | ✅ «Passordet må inneholde minst ett tall. Passordet må inneholde minst én stor bokstav.» |
-| Feil passord | Riktig brukernavn, feil passord | Feilmelding | ✅ «Feil brukernavn eller passord.» |
-| Tomt innloggingsskjema | Trykk «Logg inn» | Feilmelding ved begge felt | ✅ |
-| Logge inn med de tre rollene | `test`, `privat`, `admin` | Sendes til Oversikt | ✅ |
-| Min side uten innlogging (04.11.2026) | Åpne `/Konto/EndreProfil` og `/Konto/EndrePassord` uinnlogget | Sendes til innlogging | ✅ |
-| Endre navn (04.11.2026) | Ny privat aktør → Min side → «Endre profil», nytt navn | Lagres, nytt navn vises med en gang | ✅ «Profilen er oppdatert.», navnet vises i menyen |
-| Endre e-post uten / med feil passord (04.11.2026) | Ny e-post uten nåværende passord, så med feil passord | Avvises | ✅ «Skriv inn nåværende passord for å endre e-posten.» og «Nåværende passord er feil.» |
-| Endre til e-post som er i bruk (04.11.2026) | E-posten til en annen bruker | Avvises | ✅ «E-posten «…» er allerede registrert.» |
-| Endre e-post (04.11.2026) | Ny e-post med riktig passord | Lagres | ✅ Ny e-post vises på Min side |
-| Endre passord, feil input (04.11.2026) | Feil nåværende passord · nye passord ulike · for kort passord | Feilmelding for hver | ✅ «Nåværende passord er feil.» · «Passordene er ikke like.» · «Passordet må være på minst 8 tegn.» |
-| Endre passord (04.11.2026) | Riktig nåværende og gyldig nytt passord, logg ut og inn igjen | Fortsatt innlogget etter byttet, gammelt passord virker ikke, nytt virker | ✅ «Passordet er endret.», gammelt passord gir «Feil brukernavn eller passord.», nytt sender til Oversikt |
-
-#### Behov (offentlig aktør)
-
-| Scenario | Steg | Forventet | Faktisk |
-|---|---|---|---|
-| Melde behov | Fyll ut `/Behov/Registrer` med punkt i kartet | Lagres, vises i `/Behov`, på kartet og på detaljsiden | ✅ Lagret i MariaDB, vises alle tre steder, historikk «Behovet ble meldt inn» |
-| Tomt behovsskjema | Send uten å fylle ut | Feilmelding for hvert påkrevde felt | ✅ Type, beskrivelse, område, kontaktperson, telefon og plassering |
-| For langt telefonnummer | 31 siffer | Feilmelding, ikke databasefeil | ✅ «Telefonnummeret kan være på maks 30 tegn.» |
-| Endre eget behov (04.11.2026) | Detaljside → «Endre behovet», bytt beskrivelse og prioritet moderat → høy, lagre | Lagres med en gang, vises i historikken | ✅ «Endringene er lagret.», merket «Høy prioritet», historikk «Behovet ble endret, prioritet moderat → høy» |
-| Endre andres behov (04.11.2026) | Annen offentlig aktør og privat aktør: GET og POST til `/Behov/Rediger/{id}` | Nektes, ingen «Endre»-knapp | ✅ Sendt til Oversikt, behovet uendret, knappen vises ikke |
-| Admin endrer behov (04.11.2026) | Som admin: endre et behov meldt av `test` | Lagres, eier uendret | ✅ Historikken viser «av admin», behovet står fortsatt som meldt av `test` |
-| Kartdata | `/Kart/Behov` og `/Kart/Ressurser` | JSON med feltene kartet bruker | ✅ 13 behov og 28 godkjente ressurser, 5 merket som tildelt. 41 markører på kartet |
-
-#### Ressurser (privat aktør og admin)
-
-| Scenario | Steg | Forventet | Faktisk |
-|---|---|---|---|
-| Tilby ressurs | Fyll ut «Tilby ressurs» med et PNG-bilde | Lagres som «Venter på godkjenning» | ✅ «Takk! Ressursen er sendt inn, og blir synlig når en administrator har godkjent den.» |
-| Ressurs uten bilde | Send uten bilde | Feilmelding | ✅ «Du må legge ved minst ett bilde av ressursen.» |
-| Admin godkjenner ressurs | `/Admin` → godkjenn | Vises på kartet, bildet kan åpnes | ✅ |
-| Endre ressurs uten nye bilder | Detaljside → «Endre ressursen», bytt type og beskrivelse, flytt punktet, lagre | Lagres, må godkjennes på nytt | ❌ → ✅ Første forsøk: nettleseren krevde nye bilder (se [Funnet under testing](#funnet-under-testing)). Etter rettingen: lagret, status «Venter på godkjenning», historikk «Ressursen ble endret og venter på ny godkjenning» |
-| Endre ressurs med nytt bilde | Last opp nytt bilde | Nytt bilde erstatter det gamle | ✅ Ett bilde, det gamle gir 404 |
-| Trekke tilbake ressurs | Detaljside → «Trekk tilbake» → bekreft | Ressursen og bildene slettes | ✅ Detaljsiden og bildet gir 404 |
-| Data blir liggende | Bygg og start containerne på nytt (uten `-v`) | Ressursen finnes fortsatt | ✅ |
-| Ressurslista (05.11.2026) | Som `test`: «Ressurser» i menyen. Som `admin`: det samme. Som `privat`: fanene Oversikt · Mine ressurser · Tilby ressurs · Hva trengs. Prøv filtrene, trykk på en ressurs, og sjekk 375 px bredde i DevTools | `test` ser godkjente med status «Tildelt» og dato, tilgjengelige øverst og tildelte under. `admin` ser alle, også de som venter og er avvist, og de avviste står nederst. Ingen ser hvem som tilbød ressursen i lista. `privat` ser bare type, adresse og status («Tildelt et behov») og knappen «Endre ressursen». Ingen feil i konsollen, og ingen sidelengs rulling på mobil | ✅ |
-
-#### Docker
-
-| Scenario | Steg | Forventet | Faktisk |
-|---|---|---|---|
-| Starte app og database | `docker compose up --build` | To containere starter, appen svarer på http://localhost:8080 | ⚠️ Port 3306 var reservert av Windows. Rettet med `DB_PORT` i `.env` (se [docs/drift.md](docs/drift.md)), deretter ✅ |
-
-### Sikkerhetstest
-
-Kjørt manuelt samme dag, med de samme brukerne. Forsøkene er gjort fra nettleseren med `fetch`, slik en angriper ville gjort, i tillegg til vanlige klikk.
-
-| Angrep / kontroll | Hva vi gjorde | Forventet | Faktisk |
-|---|---|---|---|
-| Sikkerhetsheadere | Leste svaret fra `/` | CSP, X-Frame-Options, X-Content-Type-Options, Referrer-Policy, Permissions-Policy. Ingen `Server`-header | ✅ Alle på plass, `script-src 'self'` uten `unsafe-inline` |
-| Uinnlogget tilgang | Åpnet `/Oversikt`, `/Kart`, `/Kart/Behov`, `/Kart/Ressurser`, `/Admin`, `/Behov`, `/Ressurs/Rediger/1` | Sendes til innlogging | ✅ Alle 7 |
-| Feil rolle | Som privat aktør: `/Kart`, `/Behov`, `/Admin`, `/Kart/Ressurser`, andres ressurs og `/Ressurs/Rediger/1` | Sendes til Oversikt | ✅ Alle 6 |
-| Endre andres ressurs | Annen privat bruker: GET og POST direkte til `/Ressurs/Rediger/{id}`, og åpne bildet | Nektes, ingenting endres | ✅ Nektet, ressursen uendret |
-| Manipulere skjemaet | Sendte `Status=Godkjent`, `RegistrertAv=admin` og `EksisterendeBilder=../../Program.cs` med «Endre ressurs» | Ignoreres | ✅ Status fortsatt «Venter», eier uendret |
-| CSRF | POST til `/Behov/Registrer` og `/Konto/LoggInn` uten anti-forgery-token | Avvises | ✅ 400 Bad Request |
-| XSS | Beskrivelse med `<img src=x onerror=...>` og `<script>` | Vises som tekst, kjøres ikke | ✅ Vist som tekst på detaljsiden, i kartlista og i JSON. Sidetittelen ble ikke endret |
-| SQL-injeksjon | Beskrivelse med `'); DROP TABLE Behov; --` | Lagres som tekst | ✅ Lagret uendret, tabellen `Behov` virker som før |
-| Falskt bilde | Tekstfil kalt `falsk.jpg`, Windows-program (`MZ`) kalt `program.png` | Avvises | ✅ ««falsk.jpg» er ikke et gyldig JPG-bilde.» og ««program.png» er ikke et gyldig PNG-bilde.» |
-| Stitraversering | `/Ressurs/Bilde/..%2F..%2Fappsettings.json` | Ingen fil sendes | ✅ 404 |
-| Utestenging | 5 feil passord, så riktig passord | Kontoen låses | ✅ «For mange feil forsøk. Kontoen er låst i 5 minutter.» |
-| Rate limiting | 14 innloggingsforsøk på under ett minutt fra samme IP | Fra forsøk 11: 429 | ✅ Forsøk 1–10 slapp gjennom, 11–14 fikk 429 «For mange forsøk på kort tid. Vent ett minutt og prøv igjen.» Vanlige sider virket som før |
-
-### Mobiltest
-
-Chrome-vinduet satt til 500 px bredt (det smaleste Chrome tillater), som er under Bootstraps mobilgrense på 576 px.
-
-| Side | Forventet | Faktisk |
-|---|---|---|
-| Forside | Ingen sidelengs rulling | ✅ |
-| Oversikt | Kortene stables i én kolonne | ✅ |
-| Kart | Kartet fyller skjermen, «Filter» og «Vis liste» kan nås | ✅ |
-| Melde behov, Tilby ressurs | Skjema og kart i én kolonne | ✅ |
-| Behov (liste) | Hele tabellen kan leses | ⚠️ Tabellen rulles sidelengs inne i kortet. Kolonnene «Status» og «Dato» er skjult til man ruller, og ingenting viste at det gikk an. Rettet med teksten «Sveip sidelengs for å se alle kolonnene →» over tabeller på smal skjerm, sjekket 04.11.2026 ✅ |
-| Detaljside for behov | Kartet under teksten | ✅ |
-| Tildelinger, Hva trengs | Ingen sidelengs rulling | ✅ |
-
-### Brukervennlighetstest
-
-> **Delvis gjennomført:** rollen privat aktør er testet med én person (12.11.2026). Offentlig aktør og admin gjenstår.
-
-**Hvordan:** Testpersonen fikk én oppgave om gangen, uten hjelp, og tenkte høyt mens hun løste den. Etter hver oppgave ga hun en karakter fra 1 (veldig vanskelig) til 5 (veldig lett). Til slutt svarte hun på noen spørsmål om hva som var lett, vanskelig og manglet. Én i gruppa observerte og noterte.
-
-**Testpersoner:** Person A, 24 år, jobber i barnevernstjenesten, vant med apper, har ikke sett appen før, kjenner en i gruppa · **Dato:** 12.11.2026 · **Enhet:** Mac, Safari
-
-| # | Oppgave | Rolle | Person A | Person B | Person C |
-|---|---|---|---|---|---|
-| 1 | Lag en bruker som privat aktør | – | Klarte alene (5/5) | | |
-| 2 | Tilby et aggregat med bilde, og vis hvor det står | Privat aktør | Klarte alene (5/5) | | |
-| 3 | Endre beskrivelsen av ressursen du la inn | Privat aktør | Klarte alene (5/5) | | |
-| 4 | Meld et behov for nødstrøm på Lund med høy prioritet | Offentlig aktør (`test`) | Ikke testet | | |
-| 5 | Finn alle ledige aggregater på kartet | Offentlig aktør | Ikke testet | | |
-| 6 | Finn ut hvilke ressurser som er tildelt behovet ditt | Offentlig aktør | Ikke testet | | |
-| 7 | Godkjenn en ressurs som venter, og tildel den til et behov | Admin | Ikke testet | | |
-| 8 | Finn ressursen du la inn, og se hvilken status den har | Privat aktør | Klarte alene (5/5) | | |
-| 9 | Finn ut hva som trengs akkurat nå i området ditt | Privat aktør | Klarte det, med nøling (5/5) | | |
-
-Tallet i parentes er testpersonens egen karakter fra 1 (veldig vanskelig) til 5 (veldig lett).
-
-| Funn | Hvor mange | Hva vi endret |
-|---|---|---|
-| Uklart hvem man skal kontakte, og hva man gjør videre, fra «Hva trengs». Nølte med å finne området nærmest seg | 1 av 1 | Ikke endret ennå |
-| Savnet informasjon om hva som skjer med ressursen etter at den er meldt inn | 1 av 1 | Ikke endret ennå |
-| «Venter på godkjenning» og «Tildelt et behov» ble forstått riktig | 1 av 1 | Ingen endring nødvendig |
-| Ville brukt appen fordi det er «kjekt å hjelpe», men spurte også «hva får en igjen for å bidra?» | 1 av 1 | Ikke en feil i appen. Tas med som innspill |
-
-**Tidligere tilbakemeldinger:** Etter fremføringen og sprint review endret vi blant annet lista under kartet til fullskjerm, la til filter på kartet og laget siden «Hva trengs» (commit `0d355f4`, «Rettelser etter fremføring»).
-
-### Funnet under testing
-
-| Feil | Hvor | Status |
-|---|---|---|
-| «Endre ressurs» kunne ikke lagres uten å velge nye bilder. Nettleseren viste «The Bilder av ressursen field is required.» Årsak: `List<IFormFile>` uten `?` får en skjult `[Required]` fra ASP.NET | `/Ressurs/Rediger` | Rettet: `Bilder` er nå `List<IFormFile>?`, testet på nytt ✅ |
-| Port 3306 var reservert av Windows/Hyper-V, så databasen startet ikke | `docker-compose.yml` | Rettet: porten kan settes med `DB_PORT` i `.env` |
-| Tekstfeltene hadde ikke maks lengde, mens kolonnene i databasen har det. For lang tekst ville gitt databasefeil | Alle skjemaer | Rettet: `[StringLength]` på feltene, testet ✅ |
-| Tabellene viste ikke at de kan rulles sidelengs på mobil | `/Behov`, `/Tildeling`, `/Admin` | Rettet: tekst over tabellen på skjermer under 768 px (`site.css`) |
-| Meldingen om manglende plassering ble vist to ganger (Oppgave 1) | `/Behov/Registrer`, `/Ressurs/Registrer` | Rettet i Oppgave 1, sjekket igjen i `ValideringTester` ✅ |
-
-<details>
-<summary>Systemtest fra Oppgave 1 (30.09.2026)</summary>
-
-Kjørt før Identity, MariaDB og godkjenning. Testbruker `test` / `test`.
-
-#### Registrere bruker og logge inn/ut
-
-| Scenario | Steg | Forventet resultat | Faktisk resultat |
-|---|---|---|---|
-| Registrere ny bruker | Gå til `/Konto/Registrer`, fyll ut alle felt og trykk «Registrer» | Brukeren logges inn og sendes til Oversikt | ✅ Logget inn og sendt til Oversikt. Navnet vises øverst til høyre |
-| Logge ut | Trykk på navnet øverst til høyre | Brukeren sendes til forsiden, og menyen viser «Logg inn» | ✅ Som forventet |
-| Logge inn | Logg inn med testbrukeren og med den nye brukeren | Brukeren sendes til Oversikt | ✅ Som forventet for begge brukerne |
-
-#### Feil passord og tomme felt (validering)
-
-| Scenario | Steg | Forventet resultat | Faktisk resultat |
-|---|---|---|---|
-| Feil passord | Logg inn med riktig brukernavn og feil passord | Feilmelding, og brukeren blir på innloggingssiden | ✅ «Feil brukernavn eller passord.» |
-| Tomt innloggingsskjema | Trykk «Logg inn» uten å fylle ut noe | Feilmelding ved hvert felt | ✅ «Du må skrive inn brukernavn.» og «Du må skrive inn passord.» |
-| Tomt registreringsskjema | Trykk «Registrer» uten å fylle ut noe | Feilmelding ved hvert påkrevde felt | ✅ Feilmelding for alle fem feltene, øverst og under hvert felt |
-| Ulike passord | Skriv to forskjellige passord ved registrering | Feilmelding | ✅ «Passordene er ikke like.» |
-| Brukernavnet er tatt | Registrer en bruker med brukernavnet `test` | Feilmelding | ✅ «Brukernavnet er allerede i bruk.» |
-| Tomt behovsskjema | Trykk «Registrer» på `/Behov/Registrer` uten å fylle ut noe | Feilmelding ved hvert påkrevde felt, også manglende posisjon | ⚠️ Alle feltene får feilmelding, men posisjonsmeldingen vises to ganger (se under) |
-
-#### Melde behov og registrere ressurs
-
-| Scenario | Steg | Forventet resultat | Faktisk resultat |
-|---|---|---|---|
-| Melde behov | Fyll ut `/Behov/Registrer`, klikk i kartet og trykk «Registrer» | Brukeren sendes til `/Behov`, og det nye behovet står øverst | ✅ Behovet står øverst i listen med dagens dato |
-| Registrere ressurs med posisjon | Fyll ut `/Ressurs/Registrer` med adresse, «Finn på kartet», bekreft plasseringen, legg ved bilde og trykk «Registrer» | Ressursen vises på `/Kart` på riktig sted | ✅ Grønn markør ved riktig adresse. Boblen viser adresse, tilgangsbeskrivelse, kontaktinfo og bildet |
-
-#### Docker
-
-| Scenario | Steg | Forventet resultat | Faktisk resultat |
-|---|---|---|---|
-| Starte appen i Docker | Kjør kommandoene under [Hurtigstart](#hurtigstart) og åpne http://localhost:8080 | Appen starter, og forsiden vises | ✅ Appen starter, og alle testene over ble kjørt i Docker |
-
-</details>
-
-## Bruk av KI
-
-KI er brukt som støtte gjennom hele prosjektet, fra idé til kode. Alle endringer laget med KI har gått gjennom pull request og review fra gruppemedlemmer. Mer utfyllende beskrivelse: [docs/ki-bruk.md](docs/ki-bruk.md).
-
-### Verktøy
-- **Claude (Anthropic)**, i chat og som kodeagent (Claude Code): koding, feilsøking, skissering, testing, dokumentasjon og planlegging
-
-### Bruksområder
-| Fase | Hvordan KI ble brukt |
-|---|---|
-| Idé og design | Oversette Figma-skissen til sider og komponenter, designutkast for layout og farger |
-| Koding (Oppgave 1) | Grunnstruktur (MVC, repositories, innlogging), kartfunksjon, posisjonsvelger |
-| Koding (Oppgave 2) | ASP.NET Core Identity og roller, sikkerhetsheadere, godkjenning og tildeling, detaljsider og filter, «Endre ressurs» |
-| Testing | Utkast til xUnit-tester og testscenarioer for systemtest og sikkerhetstest |
-| Drift | Veiledning steg for steg for Dockerfile, `docker-compose.yml` og feilsøking |
-| Dokumentasjon | Utkast til `docs/drift.md`, `docs/arkitektur.md` med diagrammer, og denne README-en |
-| Planlegging | Oppsett av Trello-tavle, statusoversikt over kravene i oppgaven |
-
-### Regler for KI i repoet
-[AGENT.md](AGENT.md) beskriver hvordan KI-agenter skal jobbe: aldri kode direkte i `main`, alltid egen branch og pull request, og KI merger aldri sin egen PR. Commits laget med KI er merket med `Co-Authored-By: Claude`.
-
-### Eksempler på prompter
-- *«Bygg forsiden etter Figma-skissen, med innlogging og skjema for behov og ressurser»*
-- *«Ta meg gjennom Docker-oppsettet steg for steg og forklar hva som skjer underveis»*
-- *«Se gjennom repoet og sett opp en Trello-tavle med oppgavene som er gjort og det som gjenstår»*
-- *«Gå i git-repoet og gi inspirasjon med figurer og diagrammer for hvordan arkitekturen er og hva vi skal gjøre videre. Vis hvordan jeg kan sette opp diagrammer i markdown-filer»*
-- *«Her er Oppgave 2 og statusoversikten vår. Oppdater repoet, lag det som mangler (endre ressurs), kjør testene og oppdater README»*
-
----
-
-## Arbeidsflyt
-
-- Én branch per oppgave: `feature/kort-beskrivelse` eller `fix/kort-beskrivelse`
-- All kode inn via pull request, godkjent av andre gruppemedlemmer
-- Branches slettes etter merge
-- Oppgaver følges opp i Trello: Backlogg → Klar til start → Pågår → Til review → Ferdig
-
-## Kjente begrensninger
-
-- Appen kjører over http, ikke https, i Docker. Den lytter bare på `127.0.0.1`, så den er ikke tilgjengelig fra andre maskiner.
-- Hver utvikler har sin egen lokale database. Det finnes ingen felles server.
-- Det er ikke satt opp automatisk backup av databasen. Data ligger i Docker-volumet `dbdata`.
-- Kartfliser og adressesøk hentes fra Kartverket, så kartet krever internett.
-- Se [docs/drift.md](docs/drift.md) for detaljer.
+<sub>Kartdata © Kartverket.</sub>
