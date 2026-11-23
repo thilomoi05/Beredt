@@ -98,8 +98,8 @@ Full beskrivelse: **[docs/arkitektur.md](docs/arkitektur.md)**
 **Krever:** [Docker Desktop](https://www.docker.com/products/docker-desktop/)
 
 ```bash
-git clone https://github.com/thilomoi05/Prosjekt_host_1.git
-cd Prosjekt_host_1
+git clone https://github.com/thilomoi05/Beredt.git
+cd Beredt
 cp .env.example .env      # Windows (PowerShell): copy .env.example .env
 docker compose up --build
 ```
